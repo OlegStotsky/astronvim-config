@@ -1,5 +1,3 @@
-if true then return {} end -- WARN: REMOVE THIS LINE TO ACTIVATE THIS FILE
-
 -- AstroCore provides a central place to modify mappings, vim options, autocommands, and more!
 -- Configuration documentation can be found with `:h astrocore`
 -- NOTE: We highly recommend setting up the Lua Language Server (`:LspInstall lua_ls`)
@@ -59,6 +57,11 @@ return {
           end,
           desc = "Close buffer from tabline",
         },
+        gr = {
+          function() require("telescope.builtin").lsp_references { reuse_win = true } end,
+          desc = "Find references",
+        },
+
 
         -- tables with just a `desc` key will be registered with which-key if it's installed
         -- this is useful for naming menus
