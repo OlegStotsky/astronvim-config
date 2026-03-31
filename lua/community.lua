@@ -8,5 +8,6 @@ return {
   { import = "astrocommunity.pack.lua" },
   { import = "astrocommunity.recipes.telescope-lsp-mappings" },
   { import = "astrocommunity.colorscheme.catppuccin" },
+--  { import = "astrocommunity.fuzzy-finder.telescope-nvim" },
   -- import/override with your plugins folder
 }

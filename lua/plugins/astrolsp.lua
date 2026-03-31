@@ -42,7 +42,32 @@ return {
     -- customize language server configuration options passed to `lspconfig`
     ---@diagnostic disable: missing-fields
     config = {
-      -- clangd = { capabilities = { offsetEncoding = "utf-8" } },
+      gopls = {
+        settings = {
+          gopls = {
+            buildFlags = { "-mod=vendor" },
+          },
+        },
+      },
+      basedpyright = {
+        settings = {
+          basedpyright = {
+            analysis = {
+              diagnosticMode = "openFilesOnly", -- instead of "workspace"
+              useLibraryCodeForTypes = true,
+              autoImportCompletions = true,
+              -- suppress specific rules:
+              diagnosticSeverityOverrides = {
+                reportMissingImports = "warning",
+                reportUnusedVariable = "none",
+                reportUnusedImport = "none",
+                reportMissingTypeStubs = "none",
+              },
+              typeCheckingMode = "off",
+            },
+          },
+        },
+      },
     },
     -- customize how language servers are attached
     handlers = {
@@ -79,10 +104,25 @@ return {
     mappings = {
       n = {
         -- a `cond` key can provided as the string of a server capability to be required to attach, or a function with `client` and `bufnr` parameters from the `on_attach` that returns a boolean
-        gD = {
-          function() vim.lsp.buf.declaration() end,
-          desc = "Declaration of current symbol",
-          cond = "textDocument/declaration",
+        gd = {
+          function() require("telescope.builtin").lsp_definitions { reuse_win = true } end,
+          desc = "Go to definition",
+          cond = "textDocument/definition",
+        },
+        gr = {
+          function() require("telescope.builtin").lsp_references { reuse_win = true } end,
+          desc = "Find references",
+          cond = "textDocument/references",
+        },
+        gI = {
+          function() require("telescope.builtin").lsp_implementations { reuse_win = true } end,
+          desc = "Go to implementation",
+          cond = "textDocument/implementation",
+        },
+        gy = {
+          function() require("telescope.builtin").lsp_type_definitions { reuse_win = true } end,
+          desc = "Go to type definition",
+          cond = "textDocument/typeDefinition",
         },
         ["<Leader>uY"] = {
           function() require("astrolsp.toggles").buffer_semantic_tokens() end,
@@ -90,11 +130,6 @@ return {
           cond = function(client)
             return client.supports_method "textDocument/semanticTokens/full" and vim.lsp.semantic_tokens ~= nil
           end,
-        },
-        ["gr"] = {
-          function() vim.lsp.buf.references() end,
-          desc = "Find references",
-          cond = "textDocument/declaration",
         },
         ["dl"] = {
           "<cmd>OverseerRun<CR>",
@@ -111,6 +146,20 @@ return {
     on_attach = function(client, bufnr)
       -- this would disable semanticTokensProvider for all clients
       -- client.server_capabilities.semanticTokensProvider = nil
+
+      -- Auto-save all buffers after LSP workspace edits (e.g., refactorings)
+      if client.supports_method "workspace/applyEdit" then
+        -- Only set up the handler once (check if it's already been overridden)
+        if not vim.g.astrolsp_workspace_edit_handler_set then
+          local original_handler = vim.lsp.handlers["workspace/applyEdit"]
+          vim.lsp.handlers["workspace/applyEdit"] = function(err, result, ctx, config)
+            original_handler(err, result, ctx, config)
+            -- Save all modified buffers after applying workspace edits
+            vim.cmd "silent! wall"
+          end
+          vim.g.astrolsp_workspace_edit_handler_set = true
+        end
+      end
     end,
   },
 }

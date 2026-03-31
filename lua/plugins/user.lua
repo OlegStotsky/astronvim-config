@@ -50,6 +50,16 @@ return {
       require "astronvim.plugins.configs.luasnip"(plugin, opts) -- include the default astronvim config that calls the setup call
       -- add more custom luasnip configuration such as filetype extend or custom snippets
       local luasnip = require "luasnip"
+
+      local s, t, i = luasnip.snippet, luasnip.text_node, luasnip.insert_node
+
+      luasnip.add_snippets("go", {
+        s("span", {
+          t 'ctx, span := tracing.Tracer.Start(ctx, "',
+          i(1, "span.name"),
+          t { '")', "\tdefer span.End()" },
+        }),
+      })
       luasnip.filetype_extend("javascript", { "javascriptreact" })
     end,
   },

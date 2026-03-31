@@ -57,6 +57,12 @@ return {
       n = {
         -- second key is the lefthand side of the map
 
+        -- resize splits
+        ["<C-Up>"] = { "<cmd>resize +2<cr>", desc = "Increase window height" },
+        ["<C-Down>"] = { "<cmd>resize -2<cr>", desc = "Decrease window height" },
+        ["<C-Left>"] = { "<cmd>vertical resize -2<cr>", desc = "Decrease window width" },
+        ["<C-Right>"] = { "<cmd>vertical resize +2<cr>", desc = "Increase window width" },
+
         -- navigate buffer tabs
         ["]b"] = { function() require("astrocore.buffer").nav(vim.v.count1) end, desc = "Next buffer" },
         ["[b"] = { function() require("astrocore.buffer").nav(-vim.v.count1) end, desc = "Previous buffer" },
