@@ -4,6 +4,13 @@ return {
     ---@type AstroCoreOpts
     opts = {
       mappings = {
+        n = {
+          -- Disable Neovim 0.11 built-in gr* mappings so that our `gr` (find references) fires immediately
+          grr = false,
+          gra = false,
+          grn = false,
+          gri = false,
+        },
       },
     },
   },
@@ -19,14 +26,6 @@ return {
               vim.lsp.buf.hover()
             end,
             desc = "Hover symbol details",
-          },
-          -- condition for only server with declaration capabilities
-          gr = {
-            function()
-              vim.lsp.buf.references()
-            end,
-            desc = "References of current symbol",
-            cond = "textDocument/declaration",
           },
           dt = {
             function()
