@@ -43,6 +43,7 @@ return {
     ---@diagnostic disable: missing-fields
     config = {
       gopls = {
+        cmd = { "gopls", "-remote=auto" },
         settings = {
           gopls = {
             buildFlags = { "-mod=vendor" },
