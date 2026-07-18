@@ -14,7 +14,8 @@ return {
       inlay_hints = false, -- enable/disable inlay hints on start
       semantic_tokens = true, -- enable/disable semantic token highlighting
     },
-    -- customize lsp formatting options formatting = {
+    -- customize lsp formatting options
+    formatting = {
       -- control auto formatting on save
       format_on_save = {
         enabled = false, -- enable or disable format on save globally
