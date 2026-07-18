@@ -24,3 +24,13 @@ vim.g.clipboard = {
     ["*"] = require("vim.ui.clipboard.osc52").paste "*",
   },
 }
+
+vim.api.nvim_create_autocmd("VimLeavePre", {
+  group = vim.api.nvim_create_augroup("LspShutdown", { clear = true }),
+  callback = function()
+    local clients = vim.lsp.get_clients()
+    for _, client in ipairs(clients) do
+      vim.lsp.stop_client(client.id)
+    end
+  end,
+})
