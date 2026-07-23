@@ -50,20 +50,13 @@ return {
           },
         },
       },
-      basedpyright = {
+      pyright = {
         settings = {
-          basedpyright = {
+          python = {
             analysis = {
-              diagnosticMode = "openFilesOnly", -- instead of "workspace"
+              ignore = { "**" }, -- suppress all diagnostics (keep completion/hover)
               useLibraryCodeForTypes = true,
               autoImportCompletions = true,
-              -- suppress specific rules:
-              diagnosticSeverityOverrides = {
-                reportMissingImports = "warning",
-                reportUnusedVariable = "none",
-                reportUnusedImport = "none",
-                reportMissingTypeStubs = "none",
-              },
               typeCheckingMode = "off",
             },
           },
@@ -148,18 +141,16 @@ return {
       -- this would disable semanticTokensProvider for all clients
       -- client.server_capabilities.semanticTokensProvider = nil
 
-      -- Auto-save all buffers after LSP workspace edits (e.g., refactorings)
-      if client.supports_method "workspace/applyEdit" then
-        -- Only set up the handler once (check if it's already been overridden)
-        if not vim.g.astrolsp_workspace_edit_handler_set then
-          local original_handler = vim.lsp.handlers["workspace/applyEdit"]
-          vim.lsp.handlers["workspace/applyEdit"] = function(err, result, ctx, config)
-            original_handler(err, result, ctx, config)
-            -- Save all modified buffers after applying workspace edits
-            vim.cmd "silent! wall"
-          end
-          vim.g.astrolsp_workspace_edit_handler_set = true
+      -- Auto-save all buffers after an LSP rename (edits may span multiple files).
+      -- Native vim.lsp.buf.rename() applies the WorkspaceEdit via the textDocument/rename
+      -- handler, not workspace/applyEdit, so that is the handler we must wrap.
+      if not vim.g.astrolsp_rename_handler_set then
+        local original_handler = vim.lsp.handlers["textDocument/rename"]
+        vim.lsp.handlers["textDocument/rename"] = function(err, result, ctx, config)
+          original_handler(err, result, ctx, config)
+          vim.cmd "silent! wall"
         end
+        vim.g.astrolsp_rename_handler_set = true
       end
     end,
   },
