@@ -39,11 +39,18 @@ return {
     servers = {
       -- "pyright"
     },
+    -- gopls relies on the client for file-change notifications; Neovim leaves
+    -- dynamicRegistration off by default, so edits made outside the editor never reach it.
+    capabilities = {
+      workspace = {
+        didChangeWatchedFiles = { dynamicRegistration = true },
+      },
+    },
     -- customize language server configuration options passed to `lspconfig`
     ---@diagnostic disable: missing-fields
     config = {
       gopls = {
-        cmd = { "gopls", "-remote=auto" },
+        cmd = { vim.fn.expand "$HOME" .. "/.local/share/nvim/mason/bin/gopls" },
         settings = {
           gopls = {
             buildFlags = { "-mod=vendor" },
@@ -54,7 +61,6 @@ return {
         settings = {
           python = {
             analysis = {
-              ignore = { "**" }, -- suppress all diagnostics (keep completion/hover)
               useLibraryCodeForTypes = true,
               autoImportCompletions = true,
               typeCheckingMode = "off",
